@@ -6,6 +6,8 @@
 # Experiment
 ________________________________
 
+![alt text](https://github.com/Auyin111/rl_game/edit/master/img_n_video/episode_duraions_curve.png)
+
 
 # Principle of Deep Q-learning
 ___________________________________
