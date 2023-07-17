@@ -25,6 +25,12 @@ ________________________________
 - With the help of wandb, monitor the episode duration instantly while training. The agent play well about 400 episodes.
   - ![Optional Text](./img_n_video/episode_duraions_curve.png)
 
+### File
+1. train_model.py: train the model
+2. simulate.py: simulate the game using the trained model
+3. cfg.py: the configuration of model and dataset processing
+
+
 # Principle of Deep Q-learning
 ___________________________________
 
@@ -39,7 +45,3 @@ ___________________________________
          1. allows us to learn from individual experience multiple times (avoid forgetting previous experiences)
          2. remove correlation in the observation sequences and avoid action values from oscillating or diverging catastrophically 
 
-# File
-1. train_model.py: train the model
-2. simulate.py: simulate the game using the trained model
-3. cfg.py: the configuration of model and dataset processing
