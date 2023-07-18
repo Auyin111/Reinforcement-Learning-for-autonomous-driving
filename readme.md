@@ -5,6 +5,10 @@ ________________________________
   - ![driving.gif](./img_n_video/driving_demo_epochs_100.gif)
 - Epochs 250:
   - ![driving.gif](./img_n_video/driving_demo_epochs_250.gif)
+- Epochs 1000:
+  - to be continued
+- Epochs 2000:
+  - to be continued
 - Key trick of training this model
   1. A <mark>large amount of epochs</mark> is required to train an agent to drive a car
   2. Clip the image to remove useless information to reduce the noise and memory usage. It can also increase the capacity of replay buffer
@@ -17,6 +21,10 @@ ________________________________
      1. Add more reward if it has positive reward
      2. In the early stage, increase the chance of using gas and reduce the chance of using break
   7. The training time is very long, the capability of further train a previous saved model is very important
+ 
+### File
+1. on_track_cls.ipynb: train,valid and test the on track classifier model
+2. race dqn discrete.ipynb: train and test the driving RL agent
   
 # Experiment 2
 ________________________________
