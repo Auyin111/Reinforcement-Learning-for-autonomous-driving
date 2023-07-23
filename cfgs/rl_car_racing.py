@@ -14,7 +14,7 @@ class RlCarRacingCfg:
 
     def _define_hyper(self):
         """define hyperparameters"""
-        self.LR = 5e-4
+        self.LR = 1e-4
 
     def _define_constant(self):
         # discount factor
@@ -23,9 +23,9 @@ class RlCarRacingCfg:
         # number of transitions sampled from the replay buffer
         self.BATCH_SIZE = 10 if self.test_mode else 48
 
-        self.NUM_EPISODES = 3 if self.test_mode else 1000
+        self.NUM_EPISODES = 3 if self.test_mode else 2000
         # memory capacity
-        self.MEMORY_CAP = 10 if self.test_mode else 18000
+        self.MEMORY_CAP = 10 if self.test_mode else 20000
 
         ### epsilon
         # starting value
@@ -33,10 +33,10 @@ class RlCarRacingCfg:
         # final value
         self.EPS_END = 0.05
         # rate of expoential decay of epsilon, higher means a slower decay
-        self.EPS_DECAY = 9000
+        self.EPS_DECAY = 20000
 
         # update rate of the target network
-        self.TAU = 0.02
+        self.TAU = 0.005
 
         # display
         self.EPISODE_PRINT = 20
@@ -45,7 +45,8 @@ class RlCarRacingCfg:
     def _define_wandb(self):
         self.project = 'rl_CarRacing'
         self.user = 'Kyle'
-        self.version = 'v_2_2_7'
+        self.version = 'v_2_3_3'
         self.model = 'DQN'
         self.entity = 'kaggle_winner'
-        self.md_name = f'{self.project}_{self.version}_test.pth' if self.test_mode else f'{self.project}_{self.version}.pth'
+        self.id = f'{self.project}_{self.version}'
+        self.md_name = f'{self.id}_test.pth' if self.test_mode else f'{self.id}.pth'

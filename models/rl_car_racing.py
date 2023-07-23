@@ -50,10 +50,10 @@ class DQN(nn.Module):
         return 1 + (input_size - filter_size + 2 * padding) // stride
 
     def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
+        x = F.relu6(self.conv1(x))
+        x = F.relu6(self.conv2(x))
+        x = F.relu6(self.conv3(x))
         x = torch.flatten(x, 1)
 
-        x = F.relu(self.linear1(x))
+        x = F.relu6(self.linear1(x))
         return self.linear2(x)

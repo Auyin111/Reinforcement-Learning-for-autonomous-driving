@@ -83,7 +83,7 @@ class Env(Generic[ObsType, ActType]):
     def np_random(self, value: np.random.Generator):
         self._np_random = value
 
-    def step(self, action: ActType) -> Tuple[ObsType, float, bool, bool, dict]:
+    def step(self, action: ActType, **kwargs) -> Tuple[ObsType, float, bool, bool, dict]:
         """Run one timestep of the environment's dynamics.
 
         When end of episode is reached, you are responsible for calling :meth:`reset` to reset this environment's state.
@@ -314,7 +314,7 @@ class Wrapper(Env[ObsType, ActType]):
             "Can't access `_np_random` of a wrapper, use `.unwrapped._np_random` or `.np_random`."
         )
 
-    def step(self, action: ActType) -> Tuple[ObsType, float, bool, bool, dict]:
+    def step(self, action: ActType, **kwargs) -> Tuple[ObsType, float, bool, bool, dict]:
         """Steps through the environment with action."""
         return self.env.step(action)
 

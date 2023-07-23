@@ -36,7 +36,7 @@ class TimeLimit(improved_gym.Wrapper):
         self._max_episode_steps = max_episode_steps
         self._elapsed_steps = None
 
-    def step(self, action):
+    def step(self, action, **kwargs):
         """Steps through the environment and if the number of steps elapsed exceeds ``max_episode_steps`` then truncate.
 
         Args:

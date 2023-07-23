@@ -11,6 +11,11 @@ from improved_gym.envs.box2d.car_dynamics import Car
 from improved_gym.error import DependencyNotInstalled, InvalidAction
 from improved_gym.utils import EzPickle
 
+# improved
+import torch
+from dp_spec.img import preprocess_img
+from dp_util.img import output_to_arr
+
 try:
     import Box2D
     from Box2D.b2 import contactListener, fixtureDef, polygonShape
@@ -517,7 +522,18 @@ class CarRacing(improved_gym.Env, EzPickle):
             self.render()
         return self.step(None)[0], {}
 
-    def step(self, action: Union[np.ndarray, int]):
+    def step(self, action: Union[np.ndarray, int],
+             on_track_cls_net=None, off_track_label=None, device=None
+             ):
+        """
+        Improved: on_track_cls_net, off_track_label, device are necessary. Set them default at none is prevent bug
+
+        :param action:
+        :param on_track_cls_net: on track classifier network
+        :param off_track_label: the label represent off track
+        :param device:
+        :return:
+        """
         assert self.car is not None
         if action is not None:
             if self.continuous:
@@ -538,19 +554,40 @@ class CarRacing(improved_gym.Env, EzPickle):
         self.world.Step(1.0 / FPS, 6 * 30, 2 * 30)
         self.t += 1.0 / FPS
 
-        print(self.true_speed)
         self.state = self._render("state_pixels")
-        print(self.true_speed)
-        stop
 
         step_reward = 0
         terminated = False
         truncated = False
         if action is not None:  # First step without action, called from reset()
-            self.reward -= 0.1
+            # self.reward -= 0.1
             # We actually don't want to count fuel spent, we want car to be faster.
             # self.reward -=  10 * self.car.fuel_spent / ENGINE_POWER
             self.car.fuel_spent = 0.0
+
+            # # increase the reward on road
+            # if self.reward > 0:
+            #     self.reward += 0.05
+
+            # Improved:
+            # gain reward if speed is high and penalise if too low
+            if self.true_speed >= 5:
+                self.reward += min(2 / 1000 * self.true_speed, 0.1)
+            else:
+                self.reward += (self.true_speed - 5) * 0.1
+
+            if on_track_cls_net is not None:
+                # if off track penalise
+
+                next_state = preprocess_img(self.state)
+                next_state = torch.tensor(next_state,
+                                          dtype=torch.float32, device=device).unsqueeze(0)
+                with torch.no_grad():
+                    outputs = on_track_cls_net(next_state.unsqueeze(0))
+                on_off_track = output_to_arr(outputs)[0]
+                if on_off_track == off_track_label:
+                    self.reward -= 0.1
+
             step_reward = self.reward - self.prev_reward
             self.prev_reward = self.reward
             if self.tile_visited_count == len(self.track) or self.new_lap:
@@ -707,6 +744,8 @@ class CarRacing(improved_gym.Env, EzPickle):
             np.square(self.car.hull.linearVelocity[0])
             + np.square(self.car.hull.linearVelocity[1])
         )
+        # Improved: save true_speed as attribute
+        self.true_speed = true_speed
 
         # simple wrapper to render if the indicator value is above a threshold
         def render_if_min(value, points, color):
