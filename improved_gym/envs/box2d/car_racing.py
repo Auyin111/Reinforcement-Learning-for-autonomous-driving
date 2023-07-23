@@ -565,16 +565,12 @@ class CarRacing(improved_gym.Env, EzPickle):
             # self.reward -=  10 * self.car.fuel_spent / ENGINE_POWER
             self.car.fuel_spent = 0.0
 
-            # # increase the reward on road
-            # if self.reward > 0:
-            #     self.reward += 0.05
-
             # Improved:
             # gain reward if speed is high and penalise if too low
             if self.true_speed >= 5:
-                self.reward += min(2 / 1000 * self.true_speed, 0.1)
+                self.reward += min(1 / 1000 * self.true_speed, 0.01)
             else:
-                self.reward += (self.true_speed - 5) * 0.1
+                self.reward += (self.true_speed - 5) * 0.01
 
             if on_track_cls_net is not None:
                 # if off track penalise
@@ -586,7 +582,7 @@ class CarRacing(improved_gym.Env, EzPickle):
                     outputs = on_track_cls_net(next_state.unsqueeze(0))
                 on_off_track = output_to_arr(outputs)[0]
                 if on_off_track == off_track_label:
-                    self.reward -= 0.1
+                    self.reward -= 0.02
 
             step_reward = self.reward - self.prev_reward
             self.prev_reward = self.reward

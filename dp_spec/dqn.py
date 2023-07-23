@@ -5,37 +5,69 @@ import numpy as np
 from dp_util.dqn import Transition
 
 
-def optimize_model(policy_net, target_net, memory, optimizer,
+def select_greedy_actions(states, q_network):
+    """select the greedy action base on Q-values"""
+
+    with torch.no_grad():
+        _, actions = q_network(states).max(dim=1, keepdim=True)
+
+    return actions
+
+
+def eval_actions(states, actions, rewards, dones, gamma, q_network):
+    """computes the Q-values by evaluating the actions given the current states and Q-netwoek"""
+
+    with torch.no_grad():
+        next_q_values = q_network(states).gather(1, actions)
+    q_values = rewards + (gamma * next_q_values * (1 - dones))
+
+    return q_values
+
+
+def q_learning_update(states, rewards, dones, gamma, q_network):
+    actions = select_greedy_actions(states, q_network)
+    q_values = eval_actions(states, actions, rewards, dones, gamma, q_network)
+
+    return q_values
+
+
+def double_q_learning_update(states, rewards, dones, gamma, q_network_1, q_network_2):
+    """use q_network_1 to select actions and q_network_2 to evaulate"""
+
+    actions = select_greedy_actions(states, q_network_1)
+    q_values = eval_actions(states, actions, rewards, dones, gamma, q_network_2)
+
+    return q_values
+
+
+def optimize_model(use_double_dqn, policy_net, target_net, memory, optimizer,
                    BATCH_SIZE, GAMMA, device):
     """performs a single step of the optimization"""
 
     transitions = memory.sample(BATCH_SIZE)
     batch = Transition(*zip(*transitions))
 
-    # Compute a mask of non-final states and concatenate the batch elements
-    # (a final state would've been the one after which simulation ended)
-    non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
-                                            batch.next_state)), device=device, dtype=torch.bool)
-    non_final_next_states = torch.cat([s for s in batch.next_state
-                                       if s is not None])
-
     state_batch = torch.cat(batch.state)
-    # action_batch = torch.cat(batch.action)
+    next_state_batch = torch.cat(batch.next_state)
+    action_batch = torch.cat(batch.action)
     reward_batch = torch.cat(batch.reward)
+    done_batch = torch.cat(batch.done)
 
     # Compute Q(s_t, a) by states and actions
-    state_action_values = policy_net(state_batch)
+    state_action_values = policy_net(state_batch).gather(1, action_batch)
 
-    # Compute V(s_{t+1}) for all next states
-    next_state_values = torch.zeros(BATCH_SIZE, device=device)
-    with torch.no_grad():
-        next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0]
-    # Compute the expected Q values
-    expected_state_action_values = (next_state_values * GAMMA) + reward_batch
+    if use_double_dqn:
+        target_q_values = double_q_learning_update(next_state_batch,
+                                                   reward_batch, done_batch, GAMMA,
+                                                   target_net, policy_net)
+    else:
+        target_q_values = q_learning_update(next_state_batch,
+                                            reward_batch, done_batch, GAMMA,
+                                            target_net)
 
     # Compute Huber loss
     criterion = nn.SmoothL1Loss()
-    loss = criterion(state_action_values, expected_state_action_values.unsqueeze(1))
+    loss = criterion(state_action_values, target_q_values)
 
     optimizer.zero_grad()
     loss.backward()
@@ -46,7 +78,7 @@ def optimize_model(policy_net, target_net, memory, optimizer,
     return loss
 
 
-def select_action(policy_net, states, eps_threshold):
+def select_action(policy_net, states, eps_threshold, device):
     """select the action based on the number of steps_done and random value"""
 
     sample = random.random()
@@ -54,11 +86,12 @@ def select_action(policy_net, states, eps_threshold):
     # pick action with the larger expected reward
     if sample > eps_threshold:
         with torch.no_grad():
-            return torch.argmax(policy_net(states).flatten()).item()
+            return policy_net(states).max(1)[1].view(1, 1)
 
     # select random action
     else:
-        # increaee the chance of using gas
+        # increase the chance of using gas
         int_random_act = np.random.choice(np.arange(0, 5), p=[0.05, 0.15, 0.15, 0.5, 0.15])
 
-        return int_random_act
+        return torch.tensor([[int_random_act]], device=device, dtype=torch.long)
+

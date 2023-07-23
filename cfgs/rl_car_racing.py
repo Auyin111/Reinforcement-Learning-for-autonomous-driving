@@ -25,7 +25,7 @@ class RlCarRacingCfg:
 
         self.NUM_EPISODES = 3 if self.test_mode else 2000
         # memory capacity
-        self.MEMORY_CAP = 10 if self.test_mode else 20000
+        self.MEMORY_CAP = 10 if self.test_mode else 21000
 
         ### epsilon
         # starting value
@@ -36,7 +36,7 @@ class RlCarRacingCfg:
         self.EPS_DECAY = 20000
 
         # update rate of the target network
-        self.TAU = 0.005
+        self.TAU = 0.0005
 
         # display
         self.EPISODE_PRINT = 20
@@ -45,8 +45,8 @@ class RlCarRacingCfg:
     def _define_wandb(self):
         self.project = 'rl_CarRacing'
         self.user = 'Kyle'
-        self.version = 'v_2_3_3'
-        self.model = 'DQN'
+        self.version = 'v_3_1_0'
+        self.model = 'DDDQN'
         self.entity = 'kaggle_winner'
         self.id = f'{self.project}_{self.version}'
         self.md_name = f'{self.id}_test.pth' if self.test_mode else f'{self.id}.pth'
