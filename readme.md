@@ -1,26 +1,27 @@
 # Experiment 1
 ________________________________
-- Using Deep Q-learning, the RL agent learned how to <mark>drive the car</mark> by turn left, turn right, gas, break and do nothing
-- Epochs 100:
-  - ![driving.gif](./img_n_video/driving_demo_epochs_100.gif)
-- Epochs 250:
-  - ![driving.gif](./img_n_video/driving_demo_epochs_250.gif)
+- Using Double Dueling Deep Q-learning, the RL agent learned how to <mark>drive the car</mark> by turn left, turn right, gas, break and do nothing
+- Epochs 219:
+  - ![driving.gif](./img_n_video/driving__dddqn_219_v_3_1_1.gif)
+- Epochs 500:
+  - to be continued
 - Epochs 1000:
   - to be continued
 - Epochs 2000:
   - to be continued
+- Learning curve
+  - ![driving.gif](./img_n_video/DDDQN_learning_curve.png)
 - Key trick of training this model
-  1. A <mark>large amount of epochs</mark> is required to train an agent to drive a car
-  2. Clip the image to remove useless information to reduce the noise and memory usage. It can also increase the capacity of replay buffer
-  3. As the image is zooming in the first 50 steps and it wil affect learning, do not interact with env
-  4. As the car able to gain the reward if it drives near to the glass, I used <mark>CNN to build another classifier model determine whether off track</mark>. if off track, penalise
+  1. To speed up the car, I give a reward if the speed is higher and penalise if speed is too low
+  2. A <mark>large amount of epochs</mark> is required to train an agent to drive a car
+  3. To reduce the chance of off track, I used <mark>CNN to build another classifier model determine whether off track</mark>. if off track, penalise
      - ![driving.gif](./img_n_video/on_track_cls_avg_loss_curve.png)
      - ![driving.gif](./img_n_video/on_track_cls_perf.png)
-  5. The output of 'state' from the env is just a static image. The agent <mark>can not determine the velocity of car so the agent is impossible to make a good decision</mark>. To solve this problem, I use both the 'state' and 'prev_state' as input  
-  6. During training, the car is quite inactive and tend to stay in the same point. 
-     1. Add more reward if it has positive reward
-     2. In the early stage, increase the chance of using gas and reduce the chance of using break
-  7. The training time is very long, the capability of further train a previous saved model is very important
+  4. The output of 'state' from the env is just a static image. The agent <mark>can not determine the velocity of car so the agent is impossible to make a good decision</mark>. To solve this problem, I use both the 'state' and 'prev_state' as input
+  5. Clip the image to remove useless information to reduce the noise and memory usage. It can also increase the capacity of replay buffer
+  6. As the image is zooming in the first 50 steps and it wil affect learning, do not interact with env
+  7. To speed up the training processing, I increased the chance of using gas and reduce the chance of using break
+  8. The training time is very long, the capability of further train a previous saved model is very important
  
 ### File
 1. on_track_cls.ipynb: train,valid and test the on track classifier model
