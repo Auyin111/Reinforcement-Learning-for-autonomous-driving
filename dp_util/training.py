@@ -11,7 +11,7 @@ def valid(net, dataloader, criterion,
     # since we're not training, we don't need to calculate the gradients for our outputs
     with torch.no_grad():
         for data in dataloader:
-            images, labels = data
+            images, labels, info = data
             images = images.to(device)
             images = torch.unsqueeze(images, dim=1)
             labels = labels.to(device)
@@ -30,9 +30,9 @@ def valid(net, dataloader, criterion,
             correct += (arr_predicted == arr_labels).sum().item()
 
     avg_loss = running_loss / total
-    accuracy = 100 * correct // total
+    accuracy = 100 * correct / total
 
     if verbose:
-        print(f'Accuracy of the network on the {total} images: {accuracy} % ang avg_loss: {avg_loss:.{sf}f}')
+        print(f'Accuracy of the network on the {total} images: {accuracy:.{sf}f} % ang avg_loss: {avg_loss:.{sf}f}')
 
     return avg_loss, accuracy
