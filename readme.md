@@ -26,19 +26,6 @@ ________________________________
 ### File
 1. on_track_cls.ipynb: train,valid and test the on track classifier model
 2. race dqn discrete.ipynb: train and test the driving RL agent
-  
-# Experiment 2
-________________________________
-- Using Deep Q-learning, the RL agent learned how to <mark>balance the pole</mark> by applying forces in the left and right direction on the cart
-  - ![simutation_v_2_0_5.gif](./img_n_video/simutation_v_2_0_5.gif)
-- With the help of wandb, monitor the episode duration instantly while training. The agent play well about 400 episodes.
-  - ![Optional Text](./img_n_video/episode_duraions_curve.png)
-
-### File
-1. train_model.py: train the model
-2. simulate.py: simulate the game using the trained model
-3. cfg.py: the configuration of model and dataset processing
-
 
 # Principle of Deep Q-learning
 ___________________________________
