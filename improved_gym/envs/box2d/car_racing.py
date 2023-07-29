@@ -522,9 +522,7 @@ class CarRacing(improved_gym.Env, EzPickle):
             self.render()
         return self.step(None)[0], {}
 
-    def step(self, action: Union[np.ndarray, int],
-             on_track_cls_net=None, off_track_label=None, device=None
-             ):
+    def step(self, action: Union[np.ndarray, int]):
         """
         Improved: on_track_cls_net, off_track_label, device are necessary. Set them default at none is prevent bug
 
@@ -568,21 +566,9 @@ class CarRacing(improved_gym.Env, EzPickle):
             # Improved:
             # gain reward if speed is high and penalise if too low
             if self.true_speed >= 5:
-                self.reward += min(1 / 1000 * self.true_speed, 0.05)
+                self.reward += min(1 / 1000 * self.true_speed, 0.1)
             else:
-                self.reward += (self.true_speed - 5) * 0.01
-
-            if on_track_cls_net is not None:
-                # if off track penalise
-
-                next_state = preprocess_img(self.state)
-                next_state = torch.tensor(next_state,
-                                          dtype=torch.float32, device=device).unsqueeze(0)
-                with torch.no_grad():
-                    outputs = on_track_cls_net(next_state.unsqueeze(0))
-                on_off_track = output_to_arr(outputs)[0]
-                if on_off_track == off_track_label:
-                    self.reward -= 0.5
+                self.reward += (self.true_speed - 5) * 0.02
 
             step_reward = self.reward - self.prev_reward
             self.prev_reward = self.reward
@@ -596,7 +582,7 @@ class CarRacing(improved_gym.Env, EzPickle):
             # print(f'PLAYFIELD: {PLAYFIELD}')
             if abs(x) > PLAYFIELD or abs(y) > PLAYFIELD:
                 terminated = True
-                step_reward = -200
+                step_reward = -100
                 print(f'step_reward: {step_reward}')
 
         if self.render_mode == "human":
