@@ -45,7 +45,7 @@ class RlCarRacingCfg:
     def _define_wandb(self):
         self.project = 'rl_CarRacing'
         self.user = 'Kyle'
-        self.version = 'v_3_1_1'
+        self.version = 'v_3_1_3'
         self.model = 'DDDQN'
         self.entity = 'kaggle_winner'
         self.id = f'{self.project}_{self.version}'
