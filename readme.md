@@ -1,4 +1,4 @@
-# 2D Autonomous car (gym package: CarRacing-v2)
+# 2D Reinforcement Learning Autonomous car (gym package: CarRacing-v2)
 - Using Double Dueling Deep Q-learning (RL) and Physics knowledge to train the RL agent to drive the car with the action of turning left, turning right, gas, breaking, and doing nothing
 
 ## Trick 1: Off-track penalty
