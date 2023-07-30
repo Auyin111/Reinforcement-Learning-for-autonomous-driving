@@ -1,10 +1,9 @@
 # Play the CarRacing-v2 in gym package
-________________________________
-- Using Double Dueling Deep Q-learning, the RL agent learned how to **drive the car** by turn left, turn right, gas, break and do nothing
+- Using Double Dueling Deep Q-learning, the RL agent learned how to **drive the car** by turning left, turning right, gas, break and doing nothing
 
 
-## Trick 1: Off track penalty
-- In v_3_1_3, the CNN off track classifier give a big penalty if the car is off track. <mark>It can prevent the car driving on the grass **unnecessarily**</mark>
+## Trick 1: Off-track penalty
+- In v_3_1_3, the CNN off-track classifier gives a big penalty if the car is off-track. <mark>It can prevent the car driving on the grass **unnecessarily**</mark>
 
 Info| v_3_1_2: without off track penalty          |  v_3_1_3: with off track penalty
 :-------------------------:|:-------------------------:|:-------------------------:
