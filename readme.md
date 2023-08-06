@@ -83,6 +83,7 @@ ___________________________________
 ______________________________
 
 - One of the problems of the DQN algorithm is that it overestimates the true rewards
+  - uses the same values both to select and to evaluate an action
 - To fix this, DDQN suggests using a simple trick:
   - decoupling the action selection from the action evaluation
 
