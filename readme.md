@@ -53,7 +53,7 @@ Task difficulty | Low | High
       where v is the velocity, s is the displacement, t is the time, x is the coordinates and a is the acceleration
     - ![driving.gif](./img_n_video/v_3_1_3_too_fast.gif)
   1. the best method to fix this issue is to allow the <mark>agent to look further (zoom out the image)</mark>
-    - it will increase the agent's consideration time
+    - the agent views the tight turn early and have more time to prepare
       1. the agent can <mark>reduce the car speed early</mark> when approaching a tight turn and it will reduce the proportion of displacement due to the original velocity
       2. the agent can <mark>shift the car to the outermost point early</mark> in the road
       - ![driving.gif](./img_n_video/v_3_1_3_prepare_turning.gif)
