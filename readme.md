@@ -21,7 +21,7 @@ Task difficulty | Low | High
   - ![driving.gif](./img_n_video/on_track_cls_avg_loss_curve.png)
 
 ## Trick 2: Consider "Velocity" when driving:
-  - The output of 'state' from the env is just a static image. If the agent does not know the current velocity, it <mark>can not determine how much centripetal force is required to make a turn</mark> 
+  - The output of 'state' from the env is just a static image. If the agent does not know the current velocity, it ***_can not determine how much centripetal force is required to make a turn_***
   - ![driving.gif](./img_n_video/car_turning_top.jpg)
   - To solve this problem, need to use <mark>both the 'state' and 'prev_state'</mark> as input
     - because using the original coordinate and final coordinate can derive the displacement and <mark>velocity</mark>
@@ -52,12 +52,11 @@ Task difficulty | Low | High
       ```
       where v is the velocity, s is the displacement, t is the time, x is the coordinates and a is the acceleration
     - ![driving.gif](./img_n_video/v_3_1_3_too_fast.gif)
-  1. the best method to fix this issue is to allow the <mark>agent to look further (zoom out the image)</mark>
-    - the agent views the tight turn early and have more time to prepare
-      1. the agent can <mark>reduce the car speed early</mark> when approaching a tight turn and it will reduce the proportion of displacement due to the original velocity
-      2. the agent can <mark>shift the car to the outermost point early</mark> in the road
-      - ![driving.gif](./img_n_video/v_3_1_3_prepare_turning.gif)
-  2. give a penalty if the car is too fast can also prevent off-track, but it will limit the car's speed  
+  1. the best method to fix this issue is to allow the ***_agent to look further (zoom out the image)_***
+     1. if the agent views the tight turn early, it can <mark>reduce the car speed early</mark> and it will reduce the displacement due to the original velocity
+     2. if the agent views the tight turn early, it can <mark>shift the car to the outermost point early</mark> in the road to ***_reduce the required centripetal force_***
+     - ![driving.gif](./img_n_video/v_3_1_3_prepare_turning.gif)
+  3. ***_give a penalty if the car is too fast_*** to reduce the displacement due to the original velocity. but it will limit the car's velocity.
 
 
 ### File
@@ -66,39 +65,41 @@ Task difficulty | Low | High
 3. simulate_rl_racing.py: simulate the car driving in a random environment
 
 # Principle of Deep Q-learning
-___________________________________
-
   - uses a deep neural network to approximate the different Q-value for each possible action at a state (value-function estimation)
+  - Formula:
+    ```math
+    \displaylines{Q(S_t,At)\leftarrow Q(S_t,A_t) +\alpha[R_{t+1}+\gamma max_aQ(S_{t+1},a)-Q(S_t,A_t)]
+    \\\text{where } R_{t+1}+\gamma max_aQ(S_{t+1},a) \text{ is TD Target,}
+    \\R_{t+1}+\gamma max_aQ(S_{t+1},a)-Q(S_t,A_t) \text{ is TD Error}
+    }
+    ```
   - has two phases:
     1. sampling: perform actions and store the observed expectations tuples in a replay memory
     2. Training: Select the small batch of tuple randomly and learn from it using a gradient descent update step
   ![Optional Text](./img_n_video/DQN_psaudocode.png)
-  - training might suffer from instability. Mainly because of combining a non-linear Q-value function (NN) and bootstrapping (when we update targets <mark>with existing estimates and not an actual</mark> complete return)
-    - Solution
-      1. Experience Replay
-         1. allows us to learn from individual experiences multiple times (avoid forgetting previous experiences)
-         2. remove correlation in the observation sequences and avoid action values from oscillating or diverging catastrophically 
-         
-## Principle of Double DQN
-______________________________
-
-- One of the problems of the DQN algorithm is that it overestimates the true rewards
-  - uses the same values both to select and to evaluate an action
-- To fix this, DDQN suggests using a simple trick:
-  - decoupling the action selection from the action evaluation
-
-![Optional Text](./img_n_video/double_dqn_flowchart.png)
-![Optional Text](./img_n_video/double_dqn_formula.png)
-
-## Principle of Dueling DQN
-______________________
-
-- splits the Q-values in two different parts, the value function V(s) and the advantage function A(s,a)
-- V(s) tell us how much reward we will collect from state s
-- A(s,a) tells us how much better one action is compared to the other actions
-- sometimes it is unnecessary to know the exact value of each action, so just learning the state-value function can be enough in some cases 
-
-![Optional Text](./img_n_video/dueling_dqn_architecture.png)
-![Optional Text](./img_n_video/dueling_dqn_formula.png)
-
-
+  - training might suffer from instability. Mainly because of combining a non-linear Q-value function (NN) and bootstrapping (***_when we update targets <mark>with existing estimates and not an actual</mark> complete return_***)
+  - Solution to stabilize the training
+    1. Experience Replay
+       1. allows us to learn from individual experiences multiple times
+       2. remove correlation in the observation sequences and avoid action values from oscillating or diverging catastrophically
+    2. Fixed Q-Target to stabilize the training
+       -  if both Q-values and the target values shift at every step of training, this can ***_lead to significant oscillation in training_***
+       1. use another network with fixed parameters for estimating the TD target
+       2. copy the parameters from Deep Q-network every C steps to update the target
+    3. Double DQN 
+       - As using the same values both to select and to evaluate an action, DQN algorithm ***_overestimates the true rewards_***
+       - To fix this, DDQN suggests using a simple trick:
+         - ***_decoupling the action selection from the action evaluation_***
+           1. use DQN network to select the best action to take for the next state (the action with highest Q-value)
+           2. Use Target network to calculate the target Q-value of taking that action at the next state
+      ![Optional Text](./img_n_video/double_dqn_flowchart.png)
+      ![Optional Text](./img_n_video/double_dqn_formula.png)
+    4. Dueling DQN
+       - splits the Q-values in two different parts, the value function V(s) and the advantage function A(s,a)
+         - V(s) tell us how much reward we will collect from state s
+         - A(s,a) tells us how much better one action is compared to the other actions
+         - at the end, combines both parts into a single output
+       - sometimes it is unnecessary to know the exact value of each action, so ***_just learning the state-value function can be enough in some cases_***
+      
+       ![Optional Text](./img_n_video/dueling_dqn_architecture.png)
+       ![Optional Text](./img_n_video/dueling_dqn_formula.png)
